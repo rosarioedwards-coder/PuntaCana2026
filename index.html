@@ -381,10 +381,58 @@
   @media(max-width:800px){
     #navbar{ gap:2px; padding:8px 6px; justify-content:flex-start; overflow-x:auto; flex-wrap:nowrap; }
     #navbar a{ font-size:0.7rem; padding:5px 9px; white-space:nowrap; }
+  }  /* ---------- PASSWORD GATE ---------- */
+  body.locked nav#navbar, body.locked section{ display:none !important; }
+  #password-gate{
+    display:none; position:fixed; inset:0; z-index:1000;
+    align-items:center; justify-content:center; padding:24px;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,201,74,0.25), transparent 45%),
+      radial-gradient(circle at 85% 75%, rgba(13,191,176,0.25), transparent 50%),
+      var(--ink);
   }
+  body.locked #password-gate{ display:flex; }
+  .gate-card{
+    background:var(--cream); border-radius:20px; padding:44px 36px;
+    max-width:380px; width:100%; text-align:center;
+    box-shadow:0 30px 60px rgba(0,0,0,0.35);
+  }
+  .gate-eyebrow{
+    font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; font-weight:600;
+    color:var(--coral); margin-bottom:10px;
+  }
+  .gate-title{ font-size:2.4rem; color:var(--teal); margin-bottom:8px; }
+  .gate-sub{ font-size:0.9rem; color:var(--ink); opacity:0.7; margin-bottom:22px; font-weight:300; }
+  #gate-input{
+    width:100%; padding:13px 16px; border-radius:999px; border:2px solid #e3d6b4;
+    font-family:'Poppins'; font-size:1rem; text-align:center; margin-bottom:14px;
+    outline:none; letter-spacing:2px;
+  }
+  #gate-input:focus{ border-color:var(--teal); }
+  #gate-btn{
+    width:100%; padding:13px 16px; border-radius:999px; border:none;
+    background:var(--coral); color:#fff; font-family:'Baloo 2'; font-weight:700;
+    font-size:1rem; cursor:pointer; letter-spacing:0.5px;
+  }
+  #gate-btn:hover{ background:var(--teal); }
+  .gate-error{
+    display:none; color:var(--coral); font-size:0.82rem; margin-top:12px; font-weight:600;
+  }
+  .gate-error.show{ display:block; }
 </style>
 </head>
-<body>
+<body class="locked">
+
+<div id="password-gate">
+  <div class="gate-card">
+    <div class="gate-eyebrow">Acceso privado</div>
+    <div class="gate-title script">Punta Cana</div>
+    <p class="gate-sub">Ingresa la contraseña para ver la guía</p>
+    <input type="password" id="gate-input" placeholder="Contraseña" inputmode="numeric">
+    <button id="gate-btn">Entrar</button>
+    <div class="gate-error" id="gate-error">Contraseña incorrecta, intenta de nuevo</div>
+  </div>
+</div>
 
 <nav id="navbar">
   <a href="#hero">Inicio</a>
@@ -688,6 +736,29 @@
     </div>
   </div>
 </section>
+
+<script>
+  const GATE_PASSWORD = '19862026';
+  const gateInput = document.getElementById('gate-input');
+  const gateBtn = document.getElementById('gate-btn');
+  const gateError = document.getElementById('gate-error');
+
+  if (localStorage.getItem('pc2026_unlocked') === 'yes') {
+    document.body.classList.remove('locked');
+  }
+
+  function tryUnlock(){
+    if (gateInput.value === GATE_PASSWORD) {
+      localStorage.setItem('pc2026_unlocked', 'yes');
+      document.body.classList.remove('locked');
+      gateError.classList.remove('show');
+    } else {
+      gateError.classList.add('show');
+    }
+  }
+  gateBtn.addEventListener('click', tryUnlock);
+  gateInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlock(); });
+</script>
 
 <script>
   const tripDate = new Date('2026-11-27T00:00:00');
